@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080d18">
+    <meta name="description" content="Track your expenses and understand your spending.">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+    <header class="site-header">
+        <a href="#" class="brand">
+            <span class="brand-icon">₹</span>
+            <span>Expense Tracker</span>
+        </a>
+        <span class="header-label">PERSONAL FINANCE</span>
+    </header>
+
+    <main>
+        <section class="auth-section" id="auth-section">
+            <div class="section-heading">
+                <span class="eyebrow">YOUR MONEY, YOUR CONTROL</span>
+                <h1>Welcome to your<br>personal finance space.</h1>
+                <p>Sign in or create an account to manage your expenses securely.</p>
+            </div>
+
+            <div class="auth-card">
+                <div class="auth-tabs" role="tablist" aria-label="Account access">
+                    <button class="auth-tab active" id="login-tab" type="button"
+                        role="tab" aria-selected="true" aria-controls="login-panel">Sign in</button>
+                    <button class="auth-tab" id="register-tab" type="button"
+                        role="tab" aria-selected="false" aria-controls="register-panel">Create account</button>
+                </div>
+
+                <div class="auth-panel" id="login-panel" role="tabpanel">
+                    <h2>Welcome back</h2>
+                    <p class="panel-description">Sign in to access your expenses.</p>
+                    <form id="login-form">
+                        <label for="login-email">Email address</label>
+                        <input id="login-email" type="email" autocomplete="email"
+                            placeholder="you@example.com" required>
+                        <label for="login-password">Password</label>
+                        <input id="login-password" type="password" autocomplete="current-password"
+                            placeholder="Enter your password" required>
+                        <button class="primary-button form-button" type="submit">Sign in</button>
+                        <p class="form-message" id="login-message" role="status"></p>
+                    </form>
+                    <div class="auth-links">
+                        <button class="text-button" id="forgot-password-link" type="button">Forgot password?</button>
+                        <p class="switch-prompt">New here?
+                            <button type="button" class="text-button" data-switch="register">Create an account</button>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="auth-panel" id="register-panel" role="tabpanel" hidden>
+                    <h2>Create your account</h2>
+                    <p class="panel-description">Your personal finances start here.</p>
+                    <form id="register-form">
+                        <label for="register-name">Full name</label>
+                        <input id="register-name" type="text" autocomplete="name"
+                            maxlength="100" placeholder="Your name" required>
+                        <label for="register-email">Email address</label>
+                        <input id="register-email" type="email" autocomplete="email"
+                            placeholder="you@example.com" required>
+                        <label for="register-password">Password</label>
+                        <input id="register-password" type="password" autocomplete="new-password"
+                            minlength="8" placeholder="At least 8 characters" required>
+                        <button class="primary-button form-button" type="submit">Create account</button>
+                        <p class="form-message" id="register-message" role="status"></p>
+                    </form>
+                    <p class="switch-prompt">Already registered?
+                        <button type="button" class="text-button" data-switch="login">Sign in</button>
+                    </p>
+                </div>
+
+                <div class="auth-panel" id="forgot-panel" hidden>
+                    <h2>Reset your password</h2>
+                    <p class="panel-description">Enter your account email to request a password reset.</p>
+                    <form id="forgot-form">
+                        <label for="forgot-email">Email address</label>
+                        <input id="forgot-email" type="email" autocomplete="email"
+                            placeholder="you@example.com" required>
+                        <button class="primary-button form-button" type="submit">Send reset link</button>
+                        <p class="form-message" id="forgot-message" role="status"></p>
+                    </form>
+                    <p class="switch-prompt">
+                        <button type="button" class="text-button" data-switch="login">Back to sign in</button>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard-section" id="dashboard-section" hidden>
+            <div class="dashboard-heading">
+                <div>
+                    <span class="eyebrow">YOUR PERSONAL DASHBOARD</span>
+                    <h1>Hello, <span id="dashboard-name">there</span></h1>
+                    <p class="panel-description">Your spending, organised in one place.</p>
+                </div>
+                <button class="secondary-button" id="logout-button" type="button">Sign out</button>
+            </div>
+
+            <div class="summary-grid">
+                <article class="summary-card">
+                    <span>Expenses this month</span>
+                    <strong id="monthly-total">₹0.00</strong>
+                </article>
+                <article class="summary-card">
+                    <span>All recorded expenses</span>
+                    <strong id="overall-total">₹0.00</strong>
+                </article>
+                <article class="summary-card">
+                    <span>Transactions</span>
+                    <strong id="expense-count">0</strong>
+                </article>
+            </div>
+
+            <section class="expense-card">
+                <h2 id="expense-form-title">Add an expense</h2>
+                <form id="expense-form">
+                    <input type="hidden" id="expense-id">
+
+                    <label for="expense-amount">Amount (₹)</label>
+                    <input id="expense-amount" type="number" min="0.01" max="99999999"
+                        step="0.01" placeholder="e.g. 250" required>
+
+                    <label for="expense-category">Category</label>
+                    <select id="expense-category" required>
+                        <option value="">Choose a category</option>
+                        <option>Food</option>
+                        <option>Transport</option>
+                        <option>Shopping</option>
+                        <option>Bills</option>
+                        <option>Health</option>
+                        <option>Education</option>
+                        <option>Entertainment</option>
+                        <option>Travel</option>
+                        <option>Other</option>
+                    </select>
+
+                    <label for="expense-date">Date</label>
+                    <input id="expense-date" type="date" required>
+
+                    <label for="expense-description">Description</label>
+                    <input id="expense-description" type="text" maxlength="255"
+                        placeholder="What did you spend on?" required>
+
+                    <div class="expense-form-actions">
+                        <button class="primary-button" id="save-expense-button" type="submit">Save expense</button>
+                        <button class="secondary-button" id="cancel-edit-button" type="button" hidden>Cancel edit</button>
+                    </div>
+                    <p class="form-message" id="expense-message" role="status"></p>
+                </form>
+            </section>
+
+            <!-- REPORTS AND EXCEL EXPORT -->
+            <section class="report-card" id="reports-section">
+                <div class="report-heading">
+                    <div>
+                        <span class="eyebrow">SPENDING INSIGHTS</span>
+                        <h2>Expense reports</h2>
+                        <p class="panel-description">Review your spending by week, month, year or custom dates.</p>
+                    </div>
+                    <button class="primary-button" id="export-excel-button" type="button">
+                        Download Excel
+                    </button>
+                </div>
+
+                <div class="report-controls">
+                    <div class="report-field">
+                        <label for="report-period">Report period</label>
+                        <select id="report-period">
+                            <option value="week">This week</option>
+                            <option value="month" selected>This month</option>
+                            <option value="year">This year</option>
+                            <option value="custom">Custom range</option>
+                        </select>
+                    </div>
+
+                    <div class="report-field custom-date-field" id="report-start-group" hidden>
+                        <label for="report-start-date">From date</label>
+                        <input id="report-start-date" type="date">
+                    </div>
+
+                    <div class="report-field custom-date-field" id="report-end-group" hidden>
+                        <label for="report-end-date">To date</label>
+                        <input id="report-end-date" type="date">
+                    </div>
+
+                    <button class="secondary-button" id="apply-report-button" type="button">Apply report</button>
+                </div>
+
+                <p class="form-message report-message" id="report-message" role="status"></p>
+
+                <div class="report-summary-grid">
+                    <article class="report-summary">
+                        <span>Total in selected period</span>
+                        <strong id="report-total">₹0.00</strong>
+                    </article>
+                    <article class="report-summary">
+                        <span>Transactions</span>
+                        <strong id="report-count">0</strong>
+                    </article>
+                    <article class="report-summary">
+                        <span>Average transaction</span>
+                        <strong id="report-average">₹0.00</strong>
+                    </article>
+                </div>
+
+                <div class="report-table-wrap">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th class="numeric-cell">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                            <tr><td colspan="4" class="table-empty">Sign in to view your report.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="expense-list-section">
+                <div class="list-heading">
+                    <div>
+                        <h2>All transactions</h2>
+                        <p class="panel-description">Your complete expense history.</p>
+                    </div>
+                    <button class="secondary-button" id="refresh-expenses" type="button">Refresh</button>
+                </div>
+                <div id="expense-list" class="expense-list">
+                    <p class="empty-state">Your expenses will appear here.</p>
+                </div>
+            </section>
+        </section>
+
+        <section class="features" aria-label="Expense Tracker features">
+            <article class="feature-card">
+                <span class="feature-icon" aria-hidden="true">↗</span>
+                <h2>Track spending</h2>
+                <p>Keep your expenses organised in one place.</p>
+            </article>
+            <article class="feature-card">
+                <span class="feature-icon" aria-hidden="true">▤</span>
+                <h2>Understand habits</h2>
+                <p>See where your money goes over time.</p>
+            </article>
+            <article class="feature-card">
+                <span class="feature-icon" aria-hidden="true">✓</span>
+                <h2>Stay in control</h2>
+                <p>Build a clearer picture of your finances.</p>
+            </article>
+        </section>
+    </main>
+
+    <!-- This support card remains at the bottom, not floating -->
+    <section class="support-section" aria-labelledby="support-title">
+        <div class="support-content">
+            <span class="support-icon" aria-hidden="true">☕</span>
+            <div>
+                <h2 id="support-title">Enjoying this project?</h2>
+                <p>If this tool has helped you, support its development with any amount you like. Your contribution is optional and appreciated.</p>
+            </div>
+            <button class="support-button" id="support-button" type="button">
+                Buy Me a Coffee ♡
+            </button>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <a href="#" class="footer-brand">Expense Tracker</a>
+        <p>Made to make managing money simpler.</p>
+        <p class="footer-copy">© <span id="current-year"></span> Expense Tracker</p>
+    </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
